@@ -36,7 +36,6 @@ OpenStreetMap, Open Weather API
 
 #### Rough Breakdown of Tasks
 
-*Research APIs - all group members
-
-*Create a Repo - Graham 
+1. Research APIs - all group members
+1. Create a Repo - Graham 
 
