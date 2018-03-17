@@ -1,6 +1,7 @@
 $(document).ready(function () {
 
-    var mymap = L.map('mapid').setView([37.5407, -77.4360], 13);
+    //var mymap = L.map('mapid').setView([37.5407, -77.4360], 13);
+    var map = L.map('map').fitWorld();
 
     L.tileLayer(`https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}`, {
         attribution: `Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>`,
@@ -19,6 +20,25 @@ $(document).ready(function () {
         var marker = L.marker([lat, lng]).addTo(mymap);
     };
 
+    function onLocationFound(e) {
+        var radius = e.accuracy / 2;
+
+        L.marker(e.latlng).addTo(map)
+            .bindPopup("You are within " + radius + " meters from this point").openPopup();
+
+        L.circle(e.latlng, radius).addTo(map);
+    }
+
+    function onLocationError(e) {
+        alert(e.message);
+    }
+
+    map.on('locationfound', onLocationFound);
+    map.on('locationerror', onLocationError);
+
+    map.locate({ setView: true, maxZoom: 16 });
+
     //DOM listener for mouse clicks
     mymap.on('click', makeMapMarker);
+
 });
