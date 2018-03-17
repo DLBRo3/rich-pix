@@ -2,10 +2,10 @@
 
 #### Team Members
 
-*Kyle Weingart
-*Graham Neal
-*Darien Brothers
-*Chris Zoghby
+*Kyle Weingart*
+*Graham Neal*
+*Darien Brothers*
+*Chris Zoghby*
 
 
 #### Description
