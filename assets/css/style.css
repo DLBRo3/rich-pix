@@ -21,3 +21,7 @@ html {
 button {
     opacity: 60%;
 }
+
+#mapid { 
+  height: 700px; 
+}
