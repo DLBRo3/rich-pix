@@ -3,17 +3,17 @@ body {
 }
 
 .container-fluid,
-.row,
 body,
 html {
     height: 100%;
     min-height: 100%;
 }
 
-button {
-    opacity: 60%;
+.btn {
+    z-index: 1000;
+    transition: none !important;
 }
 
-#mapid { 
-  height: 700px; 
+.btn-group-vertical > .btn:hover {
+    z-index: 1000;
 }

@@ -21,4 +21,5 @@ $(document).ready(function () {
 
     //DOM listener for mouse clicks
     mymap.on('click', makeMapMarker);
+
 });
