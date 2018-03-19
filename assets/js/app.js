@@ -1,17 +1,18 @@
 $(document).ready(function () {
 
-  // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyB4cTN64B5PSWyyzwTzXkoLFmioF-ry-o4",
-    authDomain: "rich-pix-3d31b.firebaseapp.com",
-    databaseURL: "https://rich-pix-3d31b.firebaseio.com",
-    projectId: "rich-pix-3d31b",
-    storageBucket: "rich-pix-3d31b.appspot.com",
-    messagingSenderId: "278100621922"
-  };
-  firebase.initializeApp(config);
+    // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyB4cTN64B5PSWyyzwTzXkoLFmioF-ry-o4",
+        authDomain: "rich-pix-3d31b.firebaseapp.com",
+        databaseURL: "https://rich-pix-3d31b.firebaseio.com",
+        projectId: "rich-pix-3d31b",
+        storageBucket: "rich-pix-3d31b.appspot.com",
+        messagingSenderId: "278100621922"
+    };
+    firebase.initializeApp(config);
 
-    //var mymap = L.map('mapid').setView([37.5407, -77.4360], 13);
+    var database = firebase.database();
+
     var map = L.map('map').fitWorld();
 
     //L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/997/256/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -41,12 +42,18 @@ $(document).ready(function () {
 
     function onLocationFound(e) {
         var radius = e.accuracy / 2;
-
+        //drops a marker at your coordinates - this can be removed if we want
         L.marker(e.latlng).addTo(map)
             .bindPopup("You are within " + radius + " meters from this point").openPopup();
-
+        //Draws a radius of the error within the locator
         L.circle(e.latlng, radius).addTo(map);
-    }
+
+        //Save the coordinates to firebase
+        database.ref().push({
+            lat: e.latlng.lat,
+            lng: e.latlng.lng,
+        });
+    };
 
     function onLocationError(e) {
         alert(e.message);
@@ -54,10 +61,9 @@ $(document).ready(function () {
 
     map.on('locationfound', onLocationFound);
     map.on('locationerror', onLocationError);
-
     map.locate({ setView: true, maxZoom: 16 });
 
     //DOM listener for mouse clicks
-    mymap.on('click', makeMapMarker);
+    map.on('click', makeMapMarker);
 
 });
