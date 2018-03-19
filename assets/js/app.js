@@ -1,6 +1,6 @@
 $(document).ready(function () {
 
-    //var mymap = L.map('mapid').setView([37.5407, -77.4360], 13);
+    //var map = L.map('mapid').setView([37.5407, -77.4360], 13);
     var map = L.map('map').fitWorld();
 
     //L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/997/256/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -25,7 +25,7 @@ $(document).ready(function () {
         var lng = clickPoint.latlng.lng;
         //console.log(clickPoint.latlng);
         //adds the marker to the map
-        var marker = L.marker([lat, lng]).addTo(mymap);
+        var marker = L.marker([lat, lng]).addTo(map);
     };
 
     function onLocationFound(e) {
@@ -47,6 +47,6 @@ $(document).ready(function () {
     map.locate({ setView: true, maxZoom: 16 });
 
     //DOM listener for mouse clicks
-    mymap.on('click', makeMapMarker);
+    map.on('click', makeMapMarker);
 
 });
