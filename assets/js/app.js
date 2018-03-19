@@ -1,5 +1,16 @@
 $(document).ready(function () {
 
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyB4cTN64B5PSWyyzwTzXkoLFmioF-ry-o4",
+    authDomain: "rich-pix-3d31b.firebaseapp.com",
+    databaseURL: "https://rich-pix-3d31b.firebaseio.com",
+    projectId: "rich-pix-3d31b",
+    storageBucket: "rich-pix-3d31b.appspot.com",
+    messagingSenderId: "278100621922"
+  };
+  firebase.initializeApp(config);
+
     //var mymap = L.map('mapid').setView([37.5407, -77.4360], 13);
     var map = L.map('map').fitWorld();
 
