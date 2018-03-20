@@ -25,3 +25,8 @@ html,
 .btn-group-vertical > .btn:hover {
     z-index: 1000;
 }
+
+.btn {
+    margin-bottom: 5px;
+
+}
