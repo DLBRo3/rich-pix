@@ -29,6 +29,11 @@ $(document).ready(function () {
         id: 'mapbox.streets'
     }).addTo(map);
 
+    //load children pins that have previously exists
+    database.ref("/connections").on("child_added", function (childSnapshot) {
+        L.marker([childSnapshot.val().lat, childSnapshot.val().lng]).addTo(map);
+    });
+
     function makeMapMarker(clickPoint) {
         //clickpoint is an object with loads of data attached to it, we are concerned with lat and long from where
         //the click is. In a future case we would like to pull this from a photo's geographic coordinates
@@ -41,14 +46,12 @@ $(document).ready(function () {
 
     function onLocationFound(e) {
         var radius = e.accuracy / 2;
-        //drops a marker at your coordinates - this can be removed if we want
-        L.marker(e.latlng).addTo(map)
-            .bindPopup("You are within " + radius + " meters from this point").openPopup();
         //Draws a radius of the error within the locator
         L.circle(e.latlng, radius).addTo(map);
-
+        //Drop a marker, now on the push of a button!
+        L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
         //Save the coordinates to firebase
-        database.ref().push({
+        database.ref("/connections").push({
             lat: e.latlng.lat,
             lng: e.latlng.lng,
         });
@@ -58,11 +61,11 @@ $(document).ready(function () {
         alert(e.message);
     }
 
-    map.on('locationfound', onLocationFound);
-    map.on('locationerror', onLocationError);
-    map.locate({ setView: true, maxZoom: 16 });
-
-    //DOM listener for mouse clicks
-    map.on('click', makeMapMarker);
-
+    //All the geolocating is now inside this button press, so it will not happen unless the user asks for it.
+    $("#drop-pin").on("click", function () {
+        event.preventDefault();
+        map.on('locationfound', onLocationFound);
+        map.on('locationerror', onLocationError);
+        map.locate({ setView: true, maxZoom: 16 });
+    });
 });
