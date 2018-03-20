@@ -4,14 +4,22 @@ body {
 
 .container-fluid,
 body,
-html {
+html,
+#map-holder {
     height: 100%;
     min-height: 100%;
 }
 
-.btn {
+#map {
+    height: 100%;
+}
+
+#pov-btn {
     z-index: 1000;
     transition: none !important;
+    text-align: center;
+    position: absolute;
+    bottom: 20px;
 }
 
 .btn-group-vertical > .btn:hover {
