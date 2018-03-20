@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
     // Initialize Firebase
     var config = {
         apiKey: "AIzaSyB4cTN64B5PSWyyzwTzXkoLFmioF-ry-o4",
@@ -37,7 +36,7 @@ $(document).ready(function () {
         var lng = clickPoint.latlng.lng;
         //console.log(clickPoint.latlng);
         //adds the marker to the map
-        var marker = L.marker([lat, lng]).addTo(mymap);
+        var marker = L.marker([lat, lng]).addTo(map);
     };
 
     function onLocationFound(e) {
