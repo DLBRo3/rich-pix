@@ -29,9 +29,13 @@ $(document).ready(function () {
         id: 'mapbox.streets'
     }).addTo(map);
 
-    //load children pins that have previously exists
+    //load child pins that are saved into firebase
     database.ref("/connections").on("child_added", function (childSnapshot) {
-        L.marker([childSnapshot.val().lat, childSnapshot.val().lng]).addTo(map);
+        //create "pretty print" versions of latitude and longitude for displaying on pins, when you click them
+        var childLat = Number.parseFloat(childSnapshot.val().lat).toPrecision(4),
+            childLng = Number.parseFloat(childSnapshot.val().lng).toPrecision(4);
+        //display pins
+        L.marker([childSnapshot.val().lat, childSnapshot.val().lng]).bindPopup(`Lat: ${childLat}<br>Lng: ${childLng}`).addTo(map);
     });
 
     function makeMapMarker(clickPoint) {
@@ -59,7 +63,14 @@ $(document).ready(function () {
 
     function onLocationError(e) {
         alert(e.message);
-    }
+    };
+
+    function locatePhone(e) {
+        //Draws a radius of the error within the locator
+        L.circleMarker(e.latlng, { color: 'red' }).addTo(map);
+        //setView will be called, initially just creates a view of greater richmond area
+        map.setView([e.latlng.lat, e.latlng.lng], 12);
+    };
 
     //All the geolocating is now inside this button press, so it will not happen unless the user asks for it.
     $("#drop-pin").on("click", function () {
@@ -68,4 +79,8 @@ $(document).ready(function () {
         map.on('locationerror', onLocationError);
         map.locate({ setView: true, maxZoom: 16 });
     });
+
+    //this runs on first page load to find phone
+    map.on('locationfound', locatePhone);
+    map.locate({ setView: true, maxZoom: 18 });
 });
