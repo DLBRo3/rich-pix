@@ -83,4 +83,18 @@ $(document).ready(function () {
     //this runs on first page load to find phone
     map.on('locationfound', locatePhone);
     map.locate({ setView: true, maxZoom: 18 });
+
+    // BEGIN CAMERA TESTING ===============================================================================
+
+    function hasGetUserMedia() {
+        return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+      }
+      
+      if (hasGetUserMedia()) {
+        // Good to go!
+      } else {
+        alert('getUserMedia() is not supported by your browser');
+      }
+
+    // END CAMERA TESTING =================================================================================
 });
