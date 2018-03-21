@@ -1,4 +1,6 @@
 $(document).ready(function () {
+
+    
     // Initialize Firebase
     var config = {
         apiKey: "AIzaSyB4cTN64B5PSWyyzwTzXkoLFmioF-ry-o4",
@@ -13,6 +15,11 @@ $(document).ready(function () {
     var database = firebase.database();
 
     var map = L.map('map').fitWorld();
+
+    
+    
+
+    
 
     //L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/997/256/{z}/{x}/{y}.png?access_token={accessToken}', {
     //    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -33,9 +40,10 @@ $(document).ready(function () {
     database.ref("/connections").on("child_added", function (childSnapshot) {
         //create "pretty print" versions of latitude and longitude for displaying on pins, when you click them
         var childLat = Number.parseFloat(childSnapshot.val().lat).toPrecision(4),
-            childLng = Number.parseFloat(childSnapshot.val().lng).toPrecision(4);
+            childLng = Number.parseFloat(childSnapshot.val().lng).toPrecision(4),
+            childDate = (childSnapshot.val().date);
         //display pins
-        L.marker([childSnapshot.val().lat, childSnapshot.val().lng]).bindPopup(`Lat: ${childLat}<br>Lng: ${childLng}`).addTo(map);
+        L.marker([childSnapshot.val().lat, childSnapshot.val().lng]).bindPopup(`Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}`).addTo(map);
     });
 
     function makeMapMarker(clickPoint) {
@@ -47,17 +55,22 @@ $(document).ready(function () {
         //adds the marker to the map
         var marker = L.marker([lat, lng]).addTo(map);
     };
-
+    
+  
+   
     function onLocationFound(e) {
         var radius = e.accuracy / 2;
-        //Draws a radius of the error within the locator
+        // Draws a radius of the error within the locator
         L.circle(e.latlng, radius).addTo(map);
-        //Drop a marker, now on the push of a button!
+        // Drop a marker, now on the push of a button!
         L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
-        //Save the coordinates to firebase
+        // Capture current date in format 03/20/2018
+        var currentDate = moment().format("L");
+        // Save the coordinates and date to firebase
         database.ref("/connections").push({
             lat: e.latlng.lat,
             lng: e.latlng.lng,
+            date: currentDate,
         });
     };
 
@@ -73,14 +86,29 @@ $(document).ready(function () {
     };
 
     //All the geolocating is now inside this button press, so it will not happen unless the user asks for it.
+    
+
     $("#drop-pin").on("click", function () {
         event.preventDefault();
         map.on('locationfound', onLocationFound);
         map.on('locationerror', onLocationError);
         map.locate({ setView: true, maxZoom: 16 });
+        
     });
 
     //this runs on first page load to find phone
     map.on('locationfound', locatePhone);
     map.locate({ setView: true, maxZoom: 18 });
+
+
+    // functions to filter by time and distance
+    
+    function filterByDistance() {
+        //filter by Distance will only show "pins" within 1 mile of users location
+        
+        var lat = clickPoint.latlng.lat;
+        var lng = clickPoint.latlng.lng;
+        
+        var marker = L.marker([lat, lng]).addTo(map);
+    };
 });
