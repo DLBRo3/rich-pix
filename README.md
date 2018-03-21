@@ -38,9 +38,3 @@ Mapping interface that the user has the ability to drop a pin on and add a photo
 #### API's
 
 OpenStreetMap, Open Weather API
-
-#### Rough Breakdown of Tasks
-
-1. Research APIs - all group members
-1. Create a Repo - Graham 
-

@@ -38,13 +38,6 @@
     <!-- Moment.js Reference -->
     <script src="https://cdn.jsdelivr.net/momentjs/2.12.0/moment.min.js"></script>
 
-     <!-- Ionicon CSS, etc -->
-
-     <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">
-
-     <link rel="stylesheet" href="css/leaflet.awesome-markers.css">
-     <script src="js/leaflet.awesome-markers.js"></script>
-
     <title>RichPix Mockup</title>
 
 </head>
@@ -72,12 +65,19 @@
                         Camera Test
                     </div>
                     <div class="card-body">
-                        <video id="screenshot-video" autoplay></video>
+                        <div class="select">
+                            <label for="videoSource">Video source: </label>
+                            <select id="videoSource"></select>
+                        </div>
+
+                        <video muted autoplay></video>
+                        
+                        <!-- <video id="screenshot-video" autoplay></video>
                         <img id="screenshot-img" src="">
                         <canvas style="display:none;"></canvas>
                         <button id="screenshot-button" class="btn btn-primary btn-sm">
                             TAKE PHOTO
-                        </button>
+                        </button> -->
                     </div>
                 </div>
             </div>
