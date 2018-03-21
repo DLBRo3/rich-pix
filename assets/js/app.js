@@ -16,6 +16,10 @@ $(document).ready(function () {
 
     var map = L.map('map').fitWorld();
 
+    var marker;
+
+    
+
     
     
 
@@ -38,7 +42,7 @@ $(document).ready(function () {
 
 
     //load child pins that are saved into firebase
-    function getPins() {
+    // function getPins() {
       database
         .ref("/connections")
         .on("child_added", function(childSnapshot) {
@@ -51,13 +55,16 @@ $(document).ready(function () {
             ).toPrecision(4),
             childDate = childSnapshot.val().date;
           //display pins
-          L.marker([childSnapshot.val().lat, childSnapshot.val().lng])
-            .bindPopup(
+            marker = L.marker([childSnapshot.val().lat, childSnapshot.val().lng]);
+            marker.bindPopup(
               `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}`
             )
-            .addTo(map);
+            // .addTo(map);
+            map.addLayer(marker);
+            // map.removeLayer(marker); this works here 
+            
         });
-    }
+    // }
     
 
    
@@ -102,6 +109,8 @@ $(document).ready(function () {
         //filter by Date will only show "pins" within a user selected time- right now that is just today's date
         // need to remove existing markers before adding filtered ones. 
         
+        
+        
         // eventually need to add index on database to make query faster 
         var currentDate = moment().format("L");
         console.log(currentDate);
@@ -142,7 +151,7 @@ $(document).ready(function () {
     
     map.on("locationfound", locatePhone);
     map.locate({ setView: true, maxZoom: 18 });
-    getPins();
+    // getPins();
 
 
   //The geocoding is inside this click event, so it will not happen unless the user clicks the "Share Your POV" button.
@@ -158,6 +167,9 @@ $(document).ready(function () {
 
 
     $("#time-filter").on("click", function () {
+
+        // map.removeLayer(marker);  this does not work here - scope issue?
+        
         filterByDate();
         
         
