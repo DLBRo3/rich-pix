@@ -14,7 +14,7 @@ html,
     height: 100%;
 }
 
-#pov-btn {
+#over-map {
     z-index: 1000;
     transition: none !important;
     text-align: center;
@@ -29,4 +29,8 @@ html,
 .btn {
     margin-bottom: 5px;
 
+}
+
+#video-card {
+    display: none;
 }
