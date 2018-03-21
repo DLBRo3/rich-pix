@@ -34,8 +34,9 @@ $(document).ready(function () {
         //create "pretty print" versions of latitude and longitude for displaying on pins, when you click them
         var childLat = Number.parseFloat(childSnapshot.val().lat).toPrecision(4),
             childLng = Number.parseFloat(childSnapshot.val().lng).toPrecision(4);
+        childCaption = childSnapshot.val().caption;
         //display pins
-        L.marker([childSnapshot.val().lat, childSnapshot.val().lng]).bindPopup(`Lat: ${childLat}<br>Lng: ${childLng}`).addTo(map);
+        L.marker([childSnapshot.val().lat, childSnapshot.val().lng]).bindPopup(`Lat: ${childLat}<br>Lng: ${childLng}<br>Caption: ${childCaption}`).addTo(map);
     });
 
     function makeMapMarker(clickPoint) {
@@ -49,15 +50,33 @@ $(document).ready(function () {
     };
 
     function onLocationFound(e) {
-        var radius = e.accuracy / 2;
-        //Draws a radius of the error within the locator
-        L.circle(e.latlng, radius).addTo(map);
+        //Draws a circle on the marker
+        L.circleMarker(e.latlng).addTo(map);
         //Drop a marker, now on the push of a button!
         L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
-        //Save the coordinates to firebase
-        database.ref("/connections").push({
-            lat: e.latlng.lat,
-            lng: e.latlng.lng,
+        //Activate the modal to save a caption with your pin
+        //Pushing no thank you will close the modal
+        $("#captionModal").modal();
+        $("#captionAdd, #noCaption").click(function () {
+            if (this.id === "captionAdd") {
+                event.preventDefault();
+                var captionValue = $("#caption-text").val();
+                $("#captionModal").modal("hide");
+                //currently double-adds database entries, not sure why.
+                database.ref("/connections").push({
+                    lat: e.latlng.lat,
+                    lng: e.latlng.lng,
+                    caption: captionValue,
+                });
+            } else if (this.id === "noCaption") {
+                event.preventDefault();
+                $("#captionModal").modal("hide");
+                database.ref("/connections").push({
+                    lat: e.latlng.lat,
+                    lng: e.latlng.lng,
+                    caption: "No Caption Provided",
+                });
+            };
         });
     };
 
@@ -79,6 +98,8 @@ $(document).ready(function () {
         map.on('locationerror', onLocationError);
         map.locate({ setView: true, maxZoom: 16 });
     });
+
+
 
     //this runs on first page load to find phone
     map.on('locationfound', locatePhone);

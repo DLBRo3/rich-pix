@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    
+
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
         crossorigin="" />
@@ -39,10 +39,34 @@
 <body>
     <div id="map" class="container-fluid h-100">
         <div class="row justify-content-center h-100 align-items-center">
-            <div id="pov-btn"   class="btn-group-vertical">
-                <button id="drop-pin" class="btn btn-success btn-sm">
+            <div id="pov-btn" class="btn-group-vertical">
+                <button id="drop-pin" type="button" class="btn btn-success btn-sm">
                     SHARE YOUR POV
                 </button>
+            </div>
+            <div class="modal fade" id="captionModal" tabindex="-1" role="dialog" aria-labelledby="captionModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="captionModalLabel">Would you like to add a caption?</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+                                <div class="form-group">
+                                    <label for="caption-text" class="col-form-label">Caption:</label>
+                                    <textarea class="form-control" id="caption-text"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" id="noCaption" data-dismiss="modal">No Thank You</button>
+                            <button type="button" class="btn btn-primary" id="captionAdd">Add Caption</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
