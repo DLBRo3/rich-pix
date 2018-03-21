@@ -1,4 +1,6 @@
 $(document).ready(function () {
+
+    
     // Initialize Firebase
     var config = {
         apiKey: "AIzaSyB4cTN64B5PSWyyzwTzXkoLFmioF-ry-o4",
@@ -14,12 +16,12 @@ $(document).ready(function () {
 
     var map = L.map('map').fitWorld();
 
-    //L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/997/256/{z}/{x}/{y}.png?access_token={accessToken}', {
-    //    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-    //    maxZoom: 18,
-    //    id: 'mapbox.streets',
-    //    accessToken: 'pk.eyJ1IjoiY2d6b2doYnkiLCJhIjoiY2pldmhkdTlhMGozcTJ3bzQ2dGVhMWxwaiJ9.XStJRTOeI3Kg1NRsnzmvNg'
-    //}).addTo(map);
+    
+    
+
+
+
+    // Add Map Tiles
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
         maxZoom: 18,
@@ -29,35 +31,49 @@ $(document).ready(function () {
         id: 'mapbox.streets'
     }).addTo(map);
 
+
+   
+// Functions 
+// ======================================================================================================================
+
+
     //load child pins that are saved into firebase
-    database.ref("/connections").on("child_added", function (childSnapshot) {
-        //create "pretty print" versions of latitude and longitude for displaying on pins, when you click them
-        var childLat = Number.parseFloat(childSnapshot.val().lat).toPrecision(4),
-            childLng = Number.parseFloat(childSnapshot.val().lng).toPrecision(4);
-        //display pins
-        L.marker([childSnapshot.val().lat, childSnapshot.val().lng]).bindPopup(`Lat: ${childLat}<br>Lng: ${childLng}`).addTo(map);
-    });
+    function getPins() {
+      database
+        .ref("/connections")
+        .on("child_added", function(childSnapshot) {
+          //create "pretty print" versions of latitude and longitude for displaying on pins, when you click them
+          var childLat = Number.parseFloat(
+              childSnapshot.val().lat
+            ).toPrecision(4),
+            childLng = Number.parseFloat(
+              childSnapshot.val().lng
+            ).toPrecision(4),
+            childDate = childSnapshot.val().date;
+          //display pins
+          L.marker([childSnapshot.val().lat, childSnapshot.val().lng])
+            .bindPopup(
+              `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}`
+            )
+            .addTo(map);
+        });
+    }
+    
 
-    function makeMapMarker(clickPoint) {
-        //clickpoint is an object with loads of data attached to it, we are concerned with lat and long from where
-        //the click is. In a future case we would like to pull this from a photo's geographic coordinates
-        var lat = clickPoint.latlng.lat;
-        var lng = clickPoint.latlng.lng;
-        //console.log(clickPoint.latlng);
-        //adds the marker to the map
-        var marker = L.marker([lat, lng]).addTo(map);
-    };
-
+   
     function onLocationFound(e) {
         var radius = e.accuracy / 2;
-        //Draws a radius of the error within the locator
+        // Draws a radius of the error within the locator
         L.circle(e.latlng, radius).addTo(map);
-        //Drop a marker, now on the push of a button!
+        // Drop a marker, now on the push of a button!
         L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
-        //Save the coordinates to firebase
+        // Capture current date in format 03/20/2018
+        var currentDate = moment().format("L");
+        // Save the coordinates and date to firebase
         database.ref("/connections").push({
             lat: e.latlng.lat,
             lng: e.latlng.lng,
+            date: currentDate,
         });
     };
 
@@ -72,12 +88,72 @@ $(document).ready(function () {
         map.setView([e.latlng.lat, e.latlng.lng], 12);
     };
 
-    //All the geolocating is now inside this button press, so it will not happen unless the user asks for it.
+    
+    // Functions to filter by time and distance
+    
+    function filterByDistance() {
+        //filter by Distance will only show "pins" within 1 mile of users location
+        
+        
+    };
+    
+    function filterByDate() {
+        
+        //filter by Date will only show "pins" within a user selected time- right now that is just today's date
+        // need to remove existing markers before adding filtered ones. 
+        
+        // eventually need to add index on database to make query faster 
+        var currentDate = moment().format("L");
+        console.log(currentDate);
+        var dateTodayRef = database.ref("/connections");
+        dateTodayRef.orderByChild("date").equalTo(currentDate).on("child_added", function(childSnapshot) {
+            console.log("Equal to date: " + childSnapshot.val().date);
+            var childLat = Number.parseFloat(
+                childSnapshot.val().lat
+              ).toPrecision(4),
+              childLng = Number.parseFloat(
+                childSnapshot.val().lng
+              ).toPrecision(4),
+              childDate = childSnapshot.val().date;
+            //display pins
+            L.marker([childSnapshot.val().lat, childSnapshot.val().lng])
+              .bindPopup(
+                `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}`
+              )
+              .addTo(map);
+        
+        
+         });
+
+        
+        
+        
+        
+    };
+    
+
+
+
+ 
+// #Main Process
+// ======================================================================================================================
+    
+  //this runs on first page load to find phone
+    
+    map.on("locationfound", locatePhone);
+    map.locate({ setView: true, maxZoom: 18 });
+    getPins();
+
+
+  //The geocoding is inside this click event, so it will not happen unless the user clicks the "Share Your POV" button.
+    
+
     $("#drop-pin").on("click", function () {
         event.preventDefault();
         map.on('locationfound', onLocationFound);
         map.on('locationerror', onLocationError);
         map.locate({ setView: true, maxZoom: 16 });
+        
     });
 
     //this runs on first page load to find phone
@@ -97,4 +173,12 @@ $(document).ready(function () {
       }
 
     // END CAMERA TESTING =================================================================================
+
+    $("#time-filter").on("click", function () {
+        filterByDate();
+        
+        
+    });
+
+
 });
