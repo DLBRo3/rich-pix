@@ -30,3 +30,7 @@ html,
     margin-bottom: 5px;
 
 }
+
+#video-card {
+    display: none;
+}

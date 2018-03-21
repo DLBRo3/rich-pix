@@ -60,14 +60,17 @@
                         OPEN CAMERA
                     </button>
                 </div>
-                <div class="card">
+                <div id="video-card" class="card">
                     <div class="card-header">
                         Camera Test
                     </div>
                     <div class="card-body">
-                        <video autoplay></video>
-                        <img src="">
+                        <video id="screenshot-video" autoplay></video>
+                        <img id="screenshot-img" src="">
                         <canvas style="display:none;"></canvas>
+                        <button id="screenshot-button" class="btn btn-primary btn-sm">
+                            TAKE PHOTO
+                        </button>
                     </div>
                 </div>
             </div>
