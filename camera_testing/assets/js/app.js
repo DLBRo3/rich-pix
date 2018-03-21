@@ -222,6 +222,12 @@ $(document).ready(function () {
                 video: {
                     deviceId: {
                         exact: videoSelect.value
+                    },
+                width: {
+                    exact: 320
+                    },
+                height: {
+                    exact: 240
                     }
                 }
             };
