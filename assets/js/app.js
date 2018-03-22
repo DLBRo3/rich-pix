@@ -32,7 +32,10 @@ $(document).ready(function () {
     //load child pins that are saved into firebase
     //load firebase data and save it into an object, edit data from the object, that way we do not edit the raw
     //data on firebase.
-    var localDatabase = [];
+    //initialize localDatabase for pulling all firebase info
+    //initialize currentLocation for storing lat and lng
+    var localDatabase = [],
+        currentLocation = {};
 
     database.ref("/connections").on("child_added", function (childSnapshot) {
         //create "pretty print" versions of latitude and longitude for displaying on pins, when you click them
@@ -53,28 +56,12 @@ $(document).ready(function () {
         L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
         //Activate the modal to save a caption with your pin
         //Pushing no thank you will close the modal
-        $("#captionModal").modal();
-        $("#captionAdd, #noCaption").click(function () {
-            event.preventDefault();
-            //$("#captionAdd").attr("disabled", true); //testing
-            if (this.id === "captionAdd") {
-                var captionValue = $("#caption-text").val();
-                //currently double-adds database entries, not sure why.
-                database.ref("/connections").push({
-                    lat: e.latlng.lat,
-                    lng: e.latlng.lng,
-                    caption: captionValue,
-                });
-            };
-            if (this.id === "noCaption") {
-                database.ref("/connections").push({
-                    lat: e.latlng.lat,
-                    lng: e.latlng.lng,
-                    caption: "No Caption Provided",
-                });
-            };
-            $("#captionModal").modal("hide");
-        });
+        currentLocation = e.latlng;
+        console.log(currentLocation);
+        $("#captionModal").modal("show");
+        //bind event listener every time it arrives to this line. 
+        //every new time you click the button, it binds a new event listener
+        //sol'n is to move click listener outside of onLocationFound
     };
 
     function onLocationError(e) {
@@ -86,6 +73,8 @@ $(document).ready(function () {
         L.circleMarker(e.latlng, { color: 'red' }).addTo(map);
         //setView will be called, initially just creates a view of greater richmond area
         map.setView([e.latlng.lat, e.latlng.lng], 12);
+        currentLocation = e.latlng;
+        console.log(currentLocation);
     };
 
     //All the geolocating is now inside this button press, so it will not happen unless the user asks for it.
@@ -96,9 +85,31 @@ $(document).ready(function () {
         map.locate({ setView: true, maxZoom: 18 });
     });
 
-
-
     //this runs on first page load to find phone
+    //save the data from this locate into global vars, then pass that into the modal.
     map.on('locationfound', locatePhone);
     map.locate({ setView: true, maxZoom: 18 });
+
+    //create a global capture for active/current location, set it, show modal, and use that global var, then
+    //pass that data to firebase
+    $("#captionAdd, #noCaption").click(function () {
+        event.preventDefault();
+        //$("#captionAdd").attr("disabled", true); //testing
+        if (this.id === "captionAdd") {
+            var captionValue = $("#caption-text").val();
+            database.ref("/connections").push({
+                lat: currentLocation.lat,
+                lng: currentLocation.lng,
+                caption: captionValue,
+            });
+        };
+        if (this.id === "noCaption") {
+            database.ref("/connections").push({
+                lat: currentLocation.lat,
+                lng: currentLocation.lng,
+                caption: "No Caption Provided",
+            });
+        };
+        $("#captionModal").modal("hide");
+    });
 });
