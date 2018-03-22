@@ -58,9 +58,13 @@ $(document).ready(function () {
         layers: [mapBox]
     });
     
-    // var markers = [];  //make this an object of arrays  
-    
     var markers = L.layerGroup([]);
+
+    var todayMarkers = L.layerGroup([]);
+
+    var monthMarkers = L.layerGroup([]);
+
+    var yearMarkers = L.layerGroup([]);
 
     var baseLayers = {
         "Street Map": mapBox,
@@ -90,39 +94,38 @@ $(document).ready(function () {
               childSnapshot.val().lng
             ).toPrecision(4),
             childDate = childSnapshot.val().date;
-            // markers.push([childSnapshot.val().lat, childSnapshot.val().lng, childSnapshot.val().date]);
-            
-            // console.log(markers);
-            //display pins
+            // create markers with popup from firebase 
             marker = L.marker([childSnapshot.val().lat, childSnapshot.val().lng]);
+            marker.date = childSnapshot.val().date;
             marker.bindPopup(
               `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}`
             )
-
+            // add each marker to global markers layer group
+            // each marker is now stored in the markers layer group and can be manipulated locally instead of on firebase
             markers.addLayer(marker);
-
             console.log(markers);
-
-            
-            // .addTo(map);
-            // let i = 0;
-            // map.eachLayer(function(){ i += 1; });
-            // console.log(map._layers);
-                
-           
+            // add markers layer group to map
+            // put this in layer group control eventually
             map.addLayer(markers);
-
-
-            // map.removeLayer(marker); 
-        //    this works here 
-            
         });
 
     }
-    
-    
 
-   
+    function filterbyToday() {
+        markers.eachLayer(function(e) {
+        if (e.date == "03/21/2018") 
+        {console.log("Yesterday")}
+            else {console.log("Today")}
+            
+        })
+
+        
+          }
+
+
+
+
+              
     function onLocationFound(e) {
         var radius = e.accuracy / 2;
         // Draws a radius of the error within the locator
@@ -226,7 +229,9 @@ $(document).ready(function () {
         map.removeLayer(markers);  
         
         
-        filterByDate();
+        // filterByDate();
+
+        filterbyToday();
         
         
     });
