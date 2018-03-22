@@ -30,6 +30,8 @@ $(document).ready(function () {
     }).addTo(map);
 
     //load child pins that are saved into firebase
+    //load firebase data and save it into an object, edit data from the object, that way we do not edit the raw
+    //data on firebase.
     database.ref("/connections").on("child_added", function (childSnapshot) {
         //create "pretty print" versions of latitude and longitude for displaying on pins, when you click them
         var childLat = Number.parseFloat(childSnapshot.val().lat).toPrecision(4),
@@ -39,16 +41,8 @@ $(document).ready(function () {
         L.marker([childSnapshot.val().lat, childSnapshot.val().lng]).bindPopup(`Lat: ${childLat}<br>Lng: ${childLng}<br>Caption: ${childCaption}`).addTo(map);
     });
 
-    function makeMapMarker(clickPoint) {
-        //clickpoint is an object with loads of data attached to it, we are concerned with lat and long from where
-        //the click is. In a future case we would like to pull this from a photo's geographic coordinates
-        var lat = clickPoint.latlng.lat;
-        var lng = clickPoint.latlng.lng;
-        //console.log(clickPoint.latlng);
-        //adds the marker to the map
-        var marker = L.marker([lat, lng]).addTo(map);
-    };
-
+    //multiple form submissions in one browser session increases the number of data points submitted by one for each
+    //form submission
     function onLocationFound(e) {
         //Draws a circle on the marker
         L.circleMarker(e.latlng).addTo(map);
@@ -58,8 +52,9 @@ $(document).ready(function () {
         //Pushing no thank you will close the modal
         $("#captionModal").modal();
         $("#captionAdd, #noCaption").click(function () {
+            event.preventDefault();
+            //$("#captionAdd").attr("disabled", true); //testing
             if (this.id === "captionAdd") {
-                event.preventDefault();
                 var captionValue = $("#caption-text").val();
                 $("#captionModal").modal("hide");
                 //currently double-adds database entries, not sure why.
@@ -68,8 +63,8 @@ $(document).ready(function () {
                     lng: e.latlng.lng,
                     caption: captionValue,
                 });
-            } else if (this.id === "noCaption") {
-                event.preventDefault();
+            };
+            if (this.id === "noCaption") {
                 $("#captionModal").modal("hide");
                 database.ref("/connections").push({
                     lat: e.latlng.lat,
@@ -96,7 +91,7 @@ $(document).ready(function () {
         event.preventDefault();
         map.on('locationfound', onLocationFound);
         map.on('locationerror', onLocationError);
-        map.locate({ setView: true, maxZoom: 16 });
+        map.locate({ setView: true, maxZoom: 18 });
     });
 
 
