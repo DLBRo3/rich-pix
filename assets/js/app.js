@@ -32,11 +32,14 @@ $(document).ready(function () {
     //load child pins that are saved into firebase
     //load firebase data and save it into an object, edit data from the object, that way we do not edit the raw
     //data on firebase.
+    var localDatabase = [];
+
     database.ref("/connections").on("child_added", function (childSnapshot) {
         //create "pretty print" versions of latitude and longitude for displaying on pins, when you click them
+        localDatabase.push(childSnapshot.val());
         var childLat = Number.parseFloat(childSnapshot.val().lat).toPrecision(4),
-            childLng = Number.parseFloat(childSnapshot.val().lng).toPrecision(4);
-        childCaption = childSnapshot.val().caption;
+            childLng = Number.parseFloat(childSnapshot.val().lng).toPrecision(4),
+            childCaption = childSnapshot.val().caption;
         //display pins
         L.marker([childSnapshot.val().lat, childSnapshot.val().lng]).bindPopup(`Lat: ${childLat}<br>Lng: ${childLng}<br>Caption: ${childCaption}`).addTo(map);
     });
@@ -56,7 +59,6 @@ $(document).ready(function () {
             //$("#captionAdd").attr("disabled", true); //testing
             if (this.id === "captionAdd") {
                 var captionValue = $("#caption-text").val();
-                $("#captionModal").modal("hide");
                 //currently double-adds database entries, not sure why.
                 database.ref("/connections").push({
                     lat: e.latlng.lat,
@@ -65,13 +67,13 @@ $(document).ready(function () {
                 });
             };
             if (this.id === "noCaption") {
-                $("#captionModal").modal("hide");
                 database.ref("/connections").push({
                     lat: e.latlng.lat,
                     lng: e.latlng.lng,
                     caption: "No Caption Provided",
                 });
             };
+            $("#captionModal").modal("hide");
         });
     };
 
