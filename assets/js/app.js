@@ -58,7 +58,9 @@ $(document).ready(function () {
         layers: [mapBox]
     });
     
-    var marker;
+    // var markers = [];  //make this an object of arrays  
+    
+    var markers = L.layerGroup([]);
 
     var baseLayers = {
         "Street Map": mapBox,
@@ -71,15 +73,12 @@ $(document).ready(function () {
 
     
 
-
-
-   
 // Functions 
 // ======================================================================================================================
 
 
     //load child pins that are saved into firebase
-    // function getPins() {
+    function getPins() {
       database
         .ref("/connections")
         .on("child_added", function(childSnapshot) {
@@ -91,17 +90,36 @@ $(document).ready(function () {
               childSnapshot.val().lng
             ).toPrecision(4),
             childDate = childSnapshot.val().date;
-          //display pins
+            // markers.push([childSnapshot.val().lat, childSnapshot.val().lng, childSnapshot.val().date]);
+            
+            // console.log(markers);
+            //display pins
             marker = L.marker([childSnapshot.val().lat, childSnapshot.val().lng]);
             marker.bindPopup(
               `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}`
             )
+
+            markers.addLayer(marker);
+
+            console.log(markers);
+
+            
             // .addTo(map);
-            map.addLayer(marker);
-            // map.removeLayer(marker); this works here 
+            // let i = 0;
+            // map.eachLayer(function(){ i += 1; });
+            // console.log(map._layers);
+                
+           
+            map.addLayer(markers);
+
+
+            // map.removeLayer(marker); 
+        //    this works here 
             
         });
-    // }
+
+    }
+    
     
 
    
@@ -145,7 +163,7 @@ $(document).ready(function () {
         
         //filter by Date will only show "pins" within a user selected time- right now that is just today's date
         // need to remove existing markers before adding filtered ones. 
-        
+        map.removeLayer(markers);
         
         
         // eventually need to add index on database to make query faster 
@@ -188,7 +206,7 @@ $(document).ready(function () {
     
     map.on("locationfound", locatePhone);
     map.locate({ setView: true, maxZoom: 18 });
-    // getPins();
+    getPins();
 
 
   //The geocoding is inside this click event, so it will not happen unless the user clicks the "Share Your POV" button.
@@ -205,7 +223,8 @@ $(document).ready(function () {
 
     $("#time-filter").on("click", function () {
 
-        // map.removeLayer(marker);  this does not work here - scope issue?
+        map.removeLayer(markers);  
+        
         
         filterByDate();
         
