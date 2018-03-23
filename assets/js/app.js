@@ -63,7 +63,7 @@ $(document).ready(function () {
     var currentWeek = moment().subtract(7, "days").format("L");
     var currentMonth = moment().subtract(1, "month").format("L");
     var currentYear = moment().subtract(12, "month").format("L");
-    console.log(currentYear);
+   
 
     // declare variables for filter by date layer groups
     var markers = L.layerGroup([]);
@@ -143,7 +143,7 @@ $(document).ready(function () {
         markers.eachLayer(function (e) {
             if (Date.parse(e.date) === Date.parse(currentDate)) {
                 todayMarkers.addLayer(e);
-                console.log(todayMarkers);
+                // console.log(todayMarkers);
 
             }
 
@@ -159,7 +159,7 @@ $(document).ready(function () {
         markers.eachLayer(function (e) {
             if (Date.parse(e.date) >= Date.parse(currentWeek)) {
                 weekMarkers.addLayer(e);
-                console.log(weekMarkers);
+                // console.log(weekMarkers);
 
             }
 
@@ -174,7 +174,7 @@ $(document).ready(function () {
         markers.eachLayer(function (e) {
             if (Date.parse(e.date) >= Date.parse(currentMonth)) {
                 monthMarkers.addLayer(e);
-                console.log(monthMarkers);
+                // console.log(monthMarkers);
 
             }
 
@@ -189,7 +189,7 @@ $(document).ready(function () {
         markers.eachLayer(function (e) {
             if (Date.parse(e.date) >= Date.parse(currentYear)) {
                 yearMarkers.addLayer(e);
-                console.log(yearMarkers);
+                // console.log(yearMarkers);
                 // console.log("cool bro" + e.date);
 
             } 
@@ -242,47 +242,22 @@ $(document).ready(function () {
 
     // Functions to filter by time and distance
 
-    function filterByDistance() {
+    function filterByDistance(e) {
+
+        console.log("Its gettin this far");
+
+        L.circle(e.latlng, {
+            color: "gray",
+            fillColor: "#d3d3d3",
+            fillOpacity: 0.5,
+            radius: 1609.344,
+        }).addTo(map);
+        map.setView([e.latlng.lat, e.latlng.lng],15)
         //filter by Distance will only show "pins" within 1 mile of users location
 
 
     };
 
-    function filterByDate() {
-
-        //filter by Date will only show "pins" within a user selected time- right now that is just today's date
-        // need to remove existing markers before adding filtered ones. 
-        map.removeLayer(markers);
-
-
-        // eventually need to add index on database to make query faster 
-        var currentDate = moment().format("L");
-        console.log(currentDate);
-        var dateTodayRef = database.ref("/connections");
-        dateTodayRef.orderByChild("date").equalTo(currentDate).on("child_added", function (childSnapshot) {
-            console.log("Equal to date: " + childSnapshot.val().date);
-            var childLat = Number.parseFloat(
-                    childSnapshot.val().lat
-                ).toPrecision(4),
-                childLng = Number.parseFloat(
-                    childSnapshot.val().lng
-                ).toPrecision(4),
-                childDate = childSnapshot.val().date;
-            //display pins
-            L.marker([childSnapshot.val().lat, childSnapshot.val().lng])
-                .bindPopup(
-                    `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}`
-                )
-                .addTo(map);
-
-
-        });
-
-
-
-
-
-    };
 
 
 
@@ -294,17 +269,17 @@ $(document).ready(function () {
     //this runs on first page load to find phone
 
     map.on("locationfound", locatePhone);
+    // map.on("locationfound", filterByDistance);     this works if i call it here but not when its inside a click event. 
     map.locate({
         setView: true,
         maxZoom: 18
     });
     getPins();
 
-    // below functions not working yet because they depend on get pins function to work - need an event handler or delay or something
-    // filterbyToday();
-    // filterbyWeek();
-    // filterbyMonth();
-    // filterbyYear();
+
+   
+
+   
 
 
     //The geocoding is inside this click event, so it will not happen unless the user clicks the "Share Your POV" button.
@@ -320,6 +295,20 @@ $(document).ready(function () {
         });
 
     });
+
+    $("#distance-filter").on("click", function () {
+        event.preventDefault();
+        map.locate();
+        map.on('locationfound', filterByDistance);
+        map.on('locationerror', onLocationError);
+        
+      
+       
+       
+        });
+
+    
+
 
 
    
