@@ -62,7 +62,8 @@ $(document).ready(function () {
     var currentDate = moment().format("L");
     var currentWeek = moment().subtract(7, "days").format("L");
     var currentMonth = moment().subtract(1, "month").format("L");
-    var currentYear = moment().subtract(1, "year").format("L");
+    var currentYear = moment().subtract(12, "month").format("L");
+    console.log(currentYear);
 
     // declare variables for filter by date layer groups
     var markers = L.layerGroup([]);
@@ -122,10 +123,15 @@ $(document).ready(function () {
                 // add each marker to global markers layer group
                 // each marker is now stored in the markers layer group and can be manipulated locally instead of on firebase
                 markers.addLayer(marker);
-                console.log(markers);
+               
                 // add markers layer group to map
-                // put this in layer group control eventually
                 map.addLayer(markers);
+
+                // call other date filter functions to populate their layer groups and make available as layers on map
+                filterbyToday();
+                filterbyWeek();
+                filterbyMonth();
+                filterbyYear();
             });
 
     }
@@ -135,13 +141,13 @@ $(document).ready(function () {
     // having issues when it is added to control - functions are not getting executed because they depend on result of drop pins- creating initial marker array
     function filterbyToday() {
         markers.eachLayer(function (e) {
-            if (e.date === currentDate) {
+            if (Date.parse(e.date) === Date.parse(currentDate)) {
                 todayMarkers.addLayer(e);
                 console.log(todayMarkers);
 
             }
 
-            map.addLayer(todayMarkers);
+            // map.addLayer(todayMarkers);
 
         })
 
@@ -151,13 +157,13 @@ $(document).ready(function () {
     // currently working on finishing remainder of these functions, adding control group
     function filterbyWeek() {
         markers.eachLayer(function (e) {
-            if (e.date >= currentWeek) {
+            if (Date.parse(e.date) >= Date.parse(currentWeek)) {
                 weekMarkers.addLayer(e);
                 console.log(weekMarkers);
 
             }
 
-            map.addLayer(weekMarkers);
+            // map.addLayer(weekMarkers);
 
         })
 
@@ -166,13 +172,13 @@ $(document).ready(function () {
 
     function filterbyMonth() {
         markers.eachLayer(function (e) {
-            if (e.date >= currentMonth) {
+            if (Date.parse(e.date) >= Date.parse(currentMonth)) {
                 monthMarkers.addLayer(e);
                 console.log(monthMarkers);
 
             }
 
-            map.addLayer(monthMarkers);
+            // map.addLayer(monthMarkers);
 
         })
 
@@ -181,18 +187,20 @@ $(document).ready(function () {
 
     function filterbyYear() {
         markers.eachLayer(function (e) {
-            if (e.date >= currentYear) {
+            if (Date.parse(e.date) >= Date.parse(currentYear)) {
                 yearMarkers.addLayer(e);
                 console.log(yearMarkers);
+                // console.log("cool bro" + e.date);
 
-            }
+            } 
+            // map.addLayer(yearMarkers);
 
-            map.addLayer(yearMarkers);
-
-        })
+        }) 
 
 
     }
+
+    // else {console.log("nope: " + e.date)}
 
 
 
@@ -314,21 +322,7 @@ $(document).ready(function () {
     });
 
 
-    $("#time-filter").on("click", function () {
-
-        map.removeLayer(markers);
-
-
-        // filterByDate();
-
-    // create dummy data to test 
-    // filterbyToday();
-     filterbyWeek();
-    // filterbyMonth();
-    // filterbyYear();
-
-
-    });
+   
 
 
 });
