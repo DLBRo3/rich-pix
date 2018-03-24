@@ -35,6 +35,7 @@ $(document).ready(function () {
 
 
 
+
     //load child pins that are saved into firebase
     //load firebase data and save it into an object, edit data from the object, that way we do not edit the raw
     //data on firebase.
@@ -43,6 +44,7 @@ $(document).ready(function () {
     var localDatabase = [],
         currentLocation = {},
         provider = new firebase.auth.GoogleAuthProvider();
+
 
     // Satellite
 
@@ -70,13 +72,47 @@ $(document).ready(function () {
 
 
 
+
+    //  Display Basemap on initial map load
+
+
     var map = L.map('map', {
         layers: [mapBox]
 
     });
 
-    var marker;
 
+    
+
+
+
+    // declare variables for todays date, last week, last month, and last year
+    var currentDate = moment().format("L");
+    var currentWeek = moment().subtract(7, "days").format("L");
+    var currentMonth = moment().subtract(1, "month").format("L");
+    var currentYear = moment().subtract(12, "month").format("L");
+   
+
+    // declare variables for filter by date layer groups
+    var markers = L.layerGroup([]);
+    var todayMarkers = L.layerGroup([]);
+    var weekMarkers = L.layerGroup([])
+    var monthMarkers = L.layerGroup([]);
+    var yearMarkers = L.layerGroup([]);
+
+    // declare variable for categories
+
+    var categoriesArray = ["Scenic Views", "Food", "Outdoors", "Booze"];
+
+    // declare variables for filter by category layer groups
+    var scenicMarkers = L.layerGroup([]);
+    var foodMarkers = L.layerGroup([]);
+    var outdoorMarkers = L.layerGroup([]);
+    var boozeMarkers = L.layerGroup([]);
+
+
+
+    // declare variables for all basemap tiles
     var baseLayers = {
         "Street Map": mapBox,
         "Satellite": satellite,
@@ -96,52 +132,208 @@ $(document).ready(function () {
     //multiple form submissions in one browser session increases the number of data points submitted by one for each
     //form submission
 
+    var dateLayers = {
+        "All": markers,
+        "Today": todayMarkers,
+        "Last Week": weekMarkers,
+        "Last Month": monthMarkers,
+        "Last Year": yearMarkers
+    };
+
+    var categoryLayers = {
+        "All": markers, 
+        "Scenic Views": scenicMarkers,
+        "Food": foodMarkers,
+        "Outdoors": outdoorMarkers,
+        "Booze": boozeMarkers,
+    }
+
+    // add layer control to toggle between different basemaps
     L.control.layers(baseLayers).addTo(map);
+
 
     // Variable for the pin that's being selected to delete
     var selectedPin;
 
-    // Functions 
-    // ======================================================================================================================
+    L.control.layers(dateLayers).addTo(map);
+
+    L.control.layers(categoryLayers).addTo(map);
+
 
     // Functions 
     // ======================================================================================================================
 
 
     //load child pins that are saved into firebase
-    // function getPins() {
-    database
-        .ref("/connections")
-        .on("child_added", function (childSnapshot) {
-            //create "pretty print" versions of latitude and longitude for displaying on pins, when you click them
-            var childLat = Number.parseFloat(
-                childSnapshot.val().lat
-            ).toPrecision(4),
-                childLng = Number.parseFloat(
-                    childSnapshot.val().lng
-                ).toPrecision(4),
-                childDate = childSnapshot.val().date;
-            //display pins
-            marker = L.marker([childSnapshot.val().lat, childSnapshot.val().lng]);
-            marker.bindPopup(
-                `<img src="${childImage}"><br>Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}<br>`
-            )
-            // selected pin from map using lat lng
-            marker.on("click", function (pin) {
-                selectedPin = pin.latlng; // here we can add selectedPin = key to give unique keys for for each pin
-            });
-            // .addTo(map);
-            map.addLayer(marker);
-            // map.removeLayer(marker); this works here 
-        });
-    // select pin, click delete and will show the pin you selected to delete in console, refresh page then key is gone
-    $("#delete-pin").on("click", function () {
-        console.log(selectedPin);
-        // => replace of a function orders pins by lat and removes on delete button
-        database.ref("/connections").orderByChild("/lat").equalTo(selectedPin.lat).once('value', snapshot => snapshot.forEach(child => child.ref.remove()));
+    function getPins() {
+        database
+            .ref("/connections")
+            .on("child_added", function (childSnapshot) {
+                //create "pretty print" versions of latitude and longitude for displaying on pins, when you click them
+                var childLat = Number.parseFloat(
+                        childSnapshot.val().lat
+                    ).toPrecision(4),
+                    childLng = Number.parseFloat(
+                        childSnapshot.val().lng
+                    ).toPrecision(4),
+                    childDate = childSnapshot.val().date;
+                    childCategory = childSnapshot.val().category;
+                    
+                // create markers with popup from firebase 
+                marker = L.marker([childSnapshot.val().lat, childSnapshot.val().lng]);
+                marker.date = childSnapshot.val().date;
+                marker.bindPopup(
+                    `<img src="${childImage}"><br>Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}<br>Category: ${childCategory}`
+                )
+                // add each marker to global markers layer group
+                // each marker is now stored in the markers layer group and can be manipulated locally instead of on firebase
+                markers.addLayer(marker);
+               
+                // add markers layer group to map
+                map.addLayer(markers);
 
-    });
-    // }
+                // call other date filter functions to populate their layer groups and make available as layers on map
+                filterbyToday();
+                filterbyWeek();
+                filterbyMonth();
+                filterbyYear();
+                filterbyScenicView();
+                filterbyBooze();
+                filterbyOutdoors();
+                filterbyFood();
+            });
+
+    }
+
+    // functions to filter by Date
+    
+    function filterbyToday() {
+        markers.eachLayer(function (e) {
+            if (Date.parse(e.date) === Date.parse(currentDate)) {
+                todayMarkers.addLayer(e);
+                // console.log(todayMarkers);
+
+            }
+
+            // map.addLayer(todayMarkers);
+
+        })
+
+
+    }
+
+    // currently working on finishing remainder of these functions, adding control group
+    function filterbyWeek() {
+        markers.eachLayer(function (e) {
+            if (Date.parse(e.date) >= Date.parse(currentWeek)) {
+                weekMarkers.addLayer(e);
+                // console.log(weekMarkers);
+
+            }
+
+            // map.addLayer(weekMarkers);
+
+        })
+
+
+    }
+
+    function filterbyMonth() {
+        markers.eachLayer(function (e) {
+            if (Date.parse(e.date) >= Date.parse(currentMonth)) {
+                monthMarkers.addLayer(e);
+                // console.log(monthMarkers);
+
+            }
+
+            // map.addLayer(monthMarkers);
+
+        })
+
+
+    }
+
+    function filterbyYear() {
+        markers.eachLayer(function (e) {
+            if (Date.parse(e.date) >= Date.parse(currentYear)) {
+                yearMarkers.addLayer(e);
+                // console.log(yearMarkers);
+                // console.log("cool bro" + e.date);
+
+            } 
+            // map.addLayer(yearMarkers);
+
+        }) 
+
+
+    }
+
+    // else {console.log("nope: " + e.date)}
+
+
+// functions to filter by Category
+
+    function filterbyScenicView() {
+        markers.eachLayer(function (e) {
+            if ((e.category) === "Scenic Views") {
+                scenicMarkers.addLayer(e);
+                // console.log(scenicMarkers);
+
+            }
+
+            // map.addLayer(todayMarkers);
+
+        })
+
+
+    }
+    function filterbyFood() {
+        markers.eachLayer(function (e) {
+            if ((e.category) === "Food") {
+                foodMarkers.addLayer(e);
+                // console.log(foodMarkers);
+
+            }
+
+            // map.addLayer(todayMarkers);
+
+        })
+
+
+    }
+
+    function filterbyBooze() {
+        markers.eachLayer(function (e) {
+            if ((e.category) === "Booze") {
+                boozeMarkers.addLayer(e);
+                // console.log(boozeMarkers);
+
+            }
+
+            // map.addLayer(todayMarkers);
+
+        })
+
+
+    }
+
+    function filterbyOutdoors() {
+        markers.eachLayer(function (e) {
+            if ((e.category) === "Outdoors") {
+                outdoorMarkers.addLayer(e);
+                // console.log(boozeMarkers);
+
+            }
+
+            // map.addLayer(todayMarkers);
+
+        })
+
+
+    }
+
+
+
 
     function onLocationFound(e) {
         var radius = e.accuracy / 2;
@@ -170,46 +362,36 @@ $(document).ready(function () {
         currentLocation = e.latlng;
         console.log(currentLocation);
     };
-    // Functions to filter by time and distance
 
-    function filterByDistance() {
+  
+   
+
+
+
+
+
+    // Functions to filter by  distance
+
+    function filterByDistance(e) {
+
+        
+
+        L.circle(e.latlng, {
+            color: "gray",
+            fillColor: "#d3d3d3",
+            fillOpacity: 0.5,
+            radius: 1609.344,
+        }).addTo(map);
+        map.setView([e.latlng.lat, e.latlng.lng],14)
         //filter by Distance will only show "pins" within 1 mile of users location
 
 
-    };
-
-    function filterByDate() {
-
-        //filter by Date will only show "pins" within a user selected time- right now that is just today's date
-        // need to remove existing markers before adding filtered ones. 
-
-        // eventually need to add index on database to make query faster 
-        var currentDate = moment().format("L");
-        console.log(currentDate);
-        var dateTodayRef = database.ref("/connections");
-        dateTodayRef.orderByChild("date").equalTo(currentDate).on("child_added", function (childSnapshot) {
-            console.log("Equal to date: " + childSnapshot.val().date);
-            var childLat = Number.parseFloat(
-                childSnapshot.val().lat
-            ).toPrecision(4),
-                childLng = Number.parseFloat(
-                    childSnapshot.val().lng
-                ).toPrecision(4),
-                childDate = childSnapshot.val().date;
-            //display pins
-            L.marker([childSnapshot.val().lat, childSnapshot.val().lng])
-                .bindPopup(
-                    `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}`
-                )
-                .addTo(map);
-
-        });
-
-
-
-
 
     };
+
+
+
+
 
 
 
@@ -221,11 +403,22 @@ $(document).ready(function () {
     //this runs on first page load to find phone
 
     map.on("locationfound", locatePhone);
+
+    
+
     map.locate({
         setView: true,
         maxZoom: 18
     });
-    // getPins();
+
+
+    getPins();
+
+
+   
+
+   
+
 
 
     //The geocoding is inside this click event, so it will not happen unless the user clicks the "Share Your POV" button.
@@ -240,6 +433,7 @@ $(document).ready(function () {
             setView: true,
             maxZoom: 16
         });
+
     });
 
     //this runs on first page load to find phone
@@ -452,12 +646,27 @@ $(document).ready(function () {
     });
 
     // END CAMERA TESTING =================================================================================
+=======
 
-    $("#time-filter").on("click", function () {
+    });
 
-        // map.removeLayer(marker);  this does not work here - scope issue?
+    $("#distance-filter").on("click", function () {
+        event.preventDefault();
+        map.locate();
+        map.on('locationfound', filterByDistance);
+        map.on('locationerror', onLocationError);
+        
+      
+       
+       
+        });
 
-        filterByDate();
+
+    
+
+
+
+
 
 
     });
