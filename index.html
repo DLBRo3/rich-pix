@@ -46,6 +46,13 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
     <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
 
+    <!-- Google API -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+    <meta name="google-signin-client_id" content="278100621922-oalhd2e719tanp330o3li96m2lr66kb1.apps.googleusercontent.com">
+    <meta name="google-signin-cookiepolicy" content="single_host_origin">
+    <meta name="google-signin-scope" content="profile email">
+
     <title>RichPix Mockup</title>
 
 </head>
@@ -95,12 +102,12 @@
                             <form>
                                 <div class="form-group">
                                     <label for="exampleInputEmail1">Email address</label>
-                                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                                    <input type="email" class="form-control" id="loginEmail" aria-describedby="emailHelp" placeholder="Enter email">
                                     <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
                                 </div>
                                 <div class="form-group">
                                     <label for="exampleInputPassword1">Password</label>
-                                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                                    <input type="password" class="form-control" id="loginPassword" placeholder="Password">
                                 </div>
                                 <small id="loginHelp" class="form-text text-muted">New User? Register
                                     <a href="login.html">here</a>
@@ -108,7 +115,7 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-warning" id="signIn">Google Sign In</button>
+                            <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark">Sign In</div>
                             <button type="button" class="btn btn-secondary" id="nologin" data-dismiss="modal">No, Thank You</button>
                             <button type="button" class="btn btn-primary" id="loginAdd">Login</button>
                         </div>
