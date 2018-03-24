@@ -12,6 +12,12 @@ $(document).ready(function () {
 
     var database = firebase.database();
 
+    // Get a reference to the storage service, which is used to create references in your storage bucket
+    var storage = firebase.storage();
+
+    // Create a storage reference from our storage service
+    var storageRef = storage.ref();
+
     var map = L.map('map').fitWorld();
 
     //L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/997/256/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -43,8 +49,9 @@ $(document).ready(function () {
         var childLat = Number.parseFloat(childSnapshot.val().lat).toPrecision(4),
             childLng = Number.parseFloat(childSnapshot.val().lng).toPrecision(4),
             childCaption = childSnapshot.val().caption;
+        childImage = childSnapshot.val().image;
         //display pins
-        L.marker([childSnapshot.val().lat, childSnapshot.val().lng]).bindPopup(`Lat: ${childLat}<br>Lng: ${childLng}<br>Caption: ${childCaption}`).addTo(map);
+        L.marker([childSnapshot.val().lat, childSnapshot.val().lng]).bindPopup(`<img src="${childImage}"> Lat: ${childLat}<br>Lng: ${childLng}<br>Caption: ${childCaption}`).addTo(map);
     });
 
     //multiple form submissions in one browser session increases the number of data points submitted by one for each
@@ -58,7 +65,7 @@ $(document).ready(function () {
         //Pushing no thank you will close the modal
         currentLocation = e.latlng;
         console.log(currentLocation);
-        $("#captionModal").modal("show");
+        //$("#captionModal").modal("show");
         //bind event listener every time it arrives to this line. 
         //every new time you click the button, it binds a new event listener
         //sol'n is to move click listener outside of onLocationFound
@@ -70,7 +77,9 @@ $(document).ready(function () {
 
     function locatePhone(e) {
         //Draws a radius of the error within the locator
-        L.circleMarker(e.latlng, { color: 'red' }).addTo(map);
+        L.circleMarker(e.latlng, {
+            color: 'red'
+        }).addTo(map);
         //setView will be called, initially just creates a view of greater richmond area
         map.setView([e.latlng.lat, e.latlng.lng], 12);
         currentLocation = e.latlng;
@@ -82,34 +91,106 @@ $(document).ready(function () {
         event.preventDefault();
         map.on('locationfound', onLocationFound);
         map.on('locationerror', onLocationError);
-        map.locate({ setView: true, maxZoom: 18 });
+        map.locate({
+            setView: true,
+            maxZoom: 18
+        });
+
+        // temp for testing -----------------------
+        $("#captionModal").modal("show");
     });
 
     //this runs on first page load to find phone
     //save the data from this locate into global vars, then pass that into the modal.
     map.on('locationfound', locatePhone);
-    map.locate({ setView: true, maxZoom: 18 });
+    map.locate({
+        setView: true,
+        maxZoom: 18
+    });
 
     //create a global capture for active/current location, set it, show modal, and use that global var, then
     //pass that data to firebase
     $("#captionAdd, #noCaption").click(function () {
         event.preventDefault();
         //$("#captionAdd").attr("disabled", true); //testing
-        if (this.id === "captionAdd") {
-            var captionValue = $("#caption-text").val();
-            database.ref("/connections").push({
-                lat: currentLocation.lat,
-                lng: currentLocation.lng,
-                caption: captionValue,
-            });
+
+        // IMAGE STORAGE +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        // File or Blob named mountains.jpg
+        var file = $("#pov-pic").get(0).files[0];
+        var fileName = (+new Date()) + '-' + file.name;
+
+        // Create the file metadata
+        var metadata = {
+            contentType: 'image/jpeg'
         };
-        if (this.id === "noCaption") {
-            database.ref("/connections").push({
-                lat: currentLocation.lat,
-                lng: currentLocation.lng,
-                caption: "No Caption Provided",
+
+        // Upload file and metadata to the object 'images/mountains.jpg'
+        var uploadTask = storageRef.child('images/' + fileName).put(file, metadata);
+
+        // Listen for state changes, errors, and completion of the upload.
+        uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+            function (snapshot) {
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log('Upload is ' + progress + '% done');
+                switch (snapshot.state) {
+                    case firebase.storage.TaskState.PAUSED: // or 'paused'
+                        console.log('Upload is paused');
+                        break;
+                    case firebase.storage.TaskState.RUNNING: // or 'running'
+                        console.log('Upload is running');
+                        break;
+                }
+            },
+            function (error) {
+
+                // A full list of error codes is available at
+                // https://firebase.google.com/docs/storage/web/handle-errors
+                switch (error.code) {
+                    case 'storage/unauthorized':
+                        // User doesn't have permission to access the object
+                        break;
+
+                    case 'storage/canceled':
+                        // User canceled the upload
+                        break;
+
+                    case 'storage/unknown':
+                        // Unknown error occurred, inspect error.serverResponse
+                        break;
+                }
+            },
+            function () {
+                // Upload completed successfully, now we can get the download URL
+                var downloadURL = uploadTask.snapshot.downloadURL;
+                var captionValue = $("#caption-text").val();
+                database.ref("/connections").push({
+                    lat: currentLocation.lat,
+                    lng: currentLocation.lng,
+                    caption: captionValue,
+                    image: downloadURL,
+                });
             });
-        };
+        // END IMAGE STORAGE +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        // if (this.id === "captionAdd") {
+        //     var captionValue = $("#caption-text").val();
+        //     database.ref("/connections").push({
+        //         lat: currentLocation.lat,
+        //         lng: currentLocation.lng,
+        //         caption: captionValue,
+        //         image: downloadURL,
+        //     });
+        // };
+        // if (this.id === "noCaption") {
+        //     database.ref("/connections").push({
+        //         lat: currentLocation.lat,
+        //         lng: currentLocation.lng,
+        //         caption: "No Caption Provided",
+        //         image: downloadURL,
+        //     });
+        // };
+
         $("#captionModal").modal("hide");
     });
 });
