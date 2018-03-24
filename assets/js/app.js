@@ -582,9 +582,9 @@ $(document).ready(function () {
     });
 
     // END CAMERA TESTING =================================================================================
-=======
 
-    });
+
+   
 
     $("#distance-filter").on("click", function () {
         event.preventDefault();
@@ -605,5 +605,5 @@ $(document).ready(function () {
 
 
 
-    });
+    
 });
