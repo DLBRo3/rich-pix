@@ -590,63 +590,7 @@ $(document).ready(function () {
         maxZoom: 18
     });
 
-    // BEGIN CAMERA TESTING ===============================================================================
-    $("#open-camera").on("click", function () {
-        event.preventDefault();
-
-        $("#video-card").css("display", "block");
-
-        function hasGetUserMedia() {
-            return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-        }
-
-        if (hasGetUserMedia()) {
-            // Good to go!
-        } else {
-            alert('getUserMedia() is not supported by your browser');
-        }
-
-        const constraints = {
-            video: true
-        };
-
-        const video = document.querySelector('video');
-
-        function handleSuccess(stream) {
-            video.srcObject = stream;
-        }
-
-        function handleError(error) {
-            console.error('Reeeejected!', error);
-        }
-
-        const button = document.querySelector('#screenshot-button');
-        const img = document.querySelector('#screenshot-img');
-        const canvas = document.createElement('canvas');
-
-        button.onclick = video.onclick = function () {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            // Other browsers will fall back to image/png
-            img.src = canvas.toDataURL('image/webp');
-        };
-
-        function handleSuccess(stream) {
-            video.srcObject = stream;
-        }
-
-        navigator.mediaDevices.getUserMedia(constraints).
-            then(handleSuccess).catch(handleError);
-
-
-
-    });
-
-    // END CAMERA TESTING =================================================================================
-
-
-
+    
     $("#distance-filter").on("click", function () {
         event.preventDefault();
         map.locate();
