@@ -25,8 +25,8 @@ $(document).ready(function () {
             'Imagery © <a href="http://mapbox.com">Mapbox</a>',
         id: 'mapbox.streets'
     })
-    
-   
+
+
 
 
     //load child pins that are saved into firebase
@@ -49,26 +49,26 @@ $(document).ready(function () {
         id: 'mapbox.satellite'
 
     })
-    
-    
+
+
     // Dark
-    
-    
+
+
     var night = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
         maxZoom: 18,
         minZoom: 5,
         attribution: 'Map tiles by Carto, under CC BY 3.0. Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>',
-        
+
 
     })
-    
-   
+
+
 
     var map = L.map('map', {
         layers: [mapBox]
 
     });
-    
+
     var marker;
 
     var baseLayers = {
@@ -95,8 +95,8 @@ $(document).ready(function () {
     // Variable for the pin that's being selected to delete
     var selectedPin;
 
-// Functions 
-// ======================================================================================================================
+    // Functions 
+    // ======================================================================================================================
 
     // Functions 
     // ======================================================================================================================
@@ -104,39 +104,39 @@ $(document).ready(function () {
 
     //load child pins that are saved into firebase
     // function getPins() {
-      database
+    database
         .ref("/connections")
-        .on("child_added", function(childSnapshot) {
-          //create "pretty print" versions of latitude and longitude for displaying on pins, when you click them
-          var childLat = Number.parseFloat(
-              childSnapshot.val().lat
+        .on("child_added", function (childSnapshot) {
+            //create "pretty print" versions of latitude and longitude for displaying on pins, when you click them
+            var childLat = Number.parseFloat(
+                childSnapshot.val().lat
             ).toPrecision(4),
-            childLng = Number.parseFloat(
-              childSnapshot.val().lng
-            ).toPrecision(4),
-            childDate = childSnapshot.val().date;
-          //display pins
+                childLng = Number.parseFloat(
+                    childSnapshot.val().lng
+                ).toPrecision(4),
+                childDate = childSnapshot.val().date;
+            //display pins
             marker = L.marker([childSnapshot.val().lat, childSnapshot.val().lng]);
             marker.bindPopup(
-              `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}<br>`
+                `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}<br>`
             )
             // selected pin from map using lat lng
-            marker.on("click", function(pin) {
+            marker.on("click", function (pin) {
                 selectedPin = pin.latlng; // here we can add selectedPin = key to give unique keys for for each pin
             });
             // .addTo(map);
             map.addLayer(marker);
             // map.removeLayer(marker); this works here 
         });
-        // select pin, click delete and will show the pin you selected to delete in console, refresh page then key is gone
-        $("#delete-pin").on("click", function() {
-            console.log(selectedPin);
-            // => replace of a function orders pins by lat and removes on delete button
-            database.ref("/connections").orderByChild("/lat").equalTo(selectedPin.lat).once('value', snapshot => snapshot.forEach(child => child.ref.remove()));
-        
-        });
+    // select pin, click delete and will show the pin you selected to delete in console, refresh page then key is gone
+    $("#delete-pin").on("click", function () {
+        console.log(selectedPin);
+        // => replace of a function orders pins by lat and removes on delete button
+        database.ref("/connections").orderByChild("/lat").equalTo(selectedPin.lat).once('value', snapshot => snapshot.forEach(child => child.ref.remove()));
+
+    });
     // }
-    
+
     function onLocationFound(e) {
         var radius = e.accuracy / 2;
         // Draws a radius of the error within the locator
@@ -164,8 +164,6 @@ $(document).ready(function () {
         currentLocation = e.latlng;
         console.log(currentLocation);
     };
-
-
     // Functions to filter by time and distance
 
     function filterByDistance() {
@@ -186,8 +184,8 @@ $(document).ready(function () {
         dateTodayRef.orderByChild("date").equalTo(currentDate).on("child_added", function (childSnapshot) {
             console.log("Equal to date: " + childSnapshot.val().date);
             var childLat = Number.parseFloat(
-                    childSnapshot.val().lat
-                ).toPrecision(4),
+                childSnapshot.val().lat
+            ).toPrecision(4),
                 childLng = Number.parseFloat(
                     childSnapshot.val().lng
                 ).toPrecision(4),
@@ -198,7 +196,7 @@ $(document).ready(function () {
                     `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}`
                 )
                 .addTo(map);
-        
+
         });
 
 
@@ -339,7 +337,7 @@ $(document).ready(function () {
         event.preventDefault();
 
         $("#video-card").css("display", "block");
-        
+
         function hasGetUserMedia() {
             return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
         }
@@ -381,7 +379,7 @@ $(document).ready(function () {
         }
 
         navigator.mediaDevices.getUserMedia(constraints).
-        then(handleSuccess).catch(handleError);
+            then(handleSuccess).catch(handleError);
 
 
 
@@ -392,7 +390,7 @@ $(document).ready(function () {
     $("#time-filter").on("click", function () {
 
         // map.removeLayer(marker);  this does not work here - scope issue?
-        
+
         filterByDate();
 
 
