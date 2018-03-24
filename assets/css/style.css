@@ -12,6 +12,7 @@ html,
 
 #map {
     height: 100%;
+    
 }
 
 #over-map {
@@ -28,7 +29,6 @@ html,
 
 .btn {
     margin-bottom: 5px;
-
 }
 
 #video-card {
