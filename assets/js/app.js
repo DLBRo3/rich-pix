@@ -72,6 +72,16 @@ $(document).ready(function () {
     var monthMarkers = L.layerGroup([]);
     var yearMarkers = L.layerGroup([]);
 
+    // declare variable for categories
+
+    var categoriesArray = ["Scenic Views", "Food", "Outdoors", "Booze"];
+
+    // declare variables for filter by category layer groups
+    var scenicMarkers = L.layerGroup([]);
+    var foodMarkers = L.layerGroup([]);
+    var outdoorMarkers = L.layerGroup([]);
+    var boozeMarkers = L.layerGroup([]);
+
 
 
     // declare variables for all basemap tiles
@@ -90,10 +100,20 @@ $(document).ready(function () {
         "Last Year": yearMarkers
     };
 
+    var categoryLayers = {
+        "All": markers, 
+        "Scenic Views": scenicMarkers,
+        "Food": foodMarkers,
+        "Outdoors": outdoorMarkers,
+        "Booze": boozeMarkers,
+    }
+
     // add layer control to toggle between different basemaps
     L.control.layers(baseLayers).addTo(map);
 
     L.control.layers(dateLayers).addTo(map);
+
+    L.control.layers(categoryLayers).addTo(map);
 
 
 
@@ -114,11 +134,13 @@ $(document).ready(function () {
                         childSnapshot.val().lng
                     ).toPrecision(4),
                     childDate = childSnapshot.val().date;
+                    childCategory = childSnapshot.val().category;
+                    
                 // create markers with popup from firebase 
                 marker = L.marker([childSnapshot.val().lat, childSnapshot.val().lng]);
                 marker.date = childSnapshot.val().date;
                 marker.bindPopup(
-                    `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}`
+                    `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}<br>Category: ${childCategory}`
                 )
                 // add each marker to global markers layer group
                 // each marker is now stored in the markers layer group and can be manipulated locally instead of on firebase
@@ -132,13 +154,16 @@ $(document).ready(function () {
                 filterbyWeek();
                 filterbyMonth();
                 filterbyYear();
+                filterbyScenicView();
+                filterbyBooze();
+                filterbyOutdoors();
+                filterbyFood();
             });
 
     }
 
     // functions to filter by Date
-    // the filterbyToday worked when it was attached to its own button
-    // having issues when it is added to control - functions are not getting executed because they depend on result of drop pins- creating initial marker array
+    
     function filterbyToday() {
         markers.eachLayer(function (e) {
             if (Date.parse(e.date) === Date.parse(currentDate)) {
@@ -203,7 +228,66 @@ $(document).ready(function () {
     // else {console.log("nope: " + e.date)}
 
 
+// functions to filter by Category
 
+    function filterbyScenicView() {
+        markers.eachLayer(function (e) {
+            if ((e.category) === "Scenic Views") {
+                scenicMarkers.addLayer(e);
+                // console.log(scenicMarkers);
+
+            }
+
+            // map.addLayer(todayMarkers);
+
+        })
+
+
+    }
+    function filterbyFood() {
+        markers.eachLayer(function (e) {
+            if ((e.category) === "Food") {
+                foodMarkers.addLayer(e);
+                // console.log(foodMarkers);
+
+            }
+
+            // map.addLayer(todayMarkers);
+
+        })
+
+
+    }
+
+    function filterbyBooze() {
+        markers.eachLayer(function (e) {
+            if ((e.category) === "Booze") {
+                boozeMarkers.addLayer(e);
+                // console.log(boozeMarkers);
+
+            }
+
+            // map.addLayer(todayMarkers);
+
+        })
+
+
+    }
+
+    function filterbyOutdoors() {
+        markers.eachLayer(function (e) {
+            if ((e.category) === "Outdoors") {
+                outdoorMarkers.addLayer(e);
+                // console.log(boozeMarkers);
+
+            }
+
+            // map.addLayer(todayMarkers);
+
+        })
+
+
+    }
 
 
 
@@ -244,7 +328,7 @@ $(document).ready(function () {
 
     function filterByDistance(e) {
 
-        console.log("Its gettin this far");
+        
 
         L.circle(e.latlng, {
             color: "gray",
@@ -252,7 +336,7 @@ $(document).ready(function () {
             fillOpacity: 0.5,
             radius: 1609.344,
         }).addTo(map);
-        map.setView([e.latlng.lat, e.latlng.lng],15)
+        map.setView([e.latlng.lat, e.latlng.lng],14)
         //filter by Distance will only show "pins" within 1 mile of users location
 
 
