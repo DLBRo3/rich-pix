@@ -35,7 +35,8 @@ $(document).ready(function () {
     //initialize localDatabase for pulling all firebase info
     //initialize currentLocation for storing lat and lng
     var localDatabase = [],
-        currentLocation = {};
+        currentLocation = {},
+        provider = new firebase.auth.GoogleAuthProvider();
 
     database.ref("/connections").on("child_added", function (childSnapshot) {
         //create "pretty print" versions of latitude and longitude for displaying on pins, when you click them
@@ -46,6 +47,17 @@ $(document).ready(function () {
         //display pins
         L.marker([childSnapshot.val().lat, childSnapshot.val().lng]).bindPopup(`Lat: ${childLat}<br>Lng: ${childLng}<br>Caption: ${childCaption}`).addTo(map);
     });
+
+    //Drop leaflet custom method (L.easybutton) to create login button
+    //When you push the (identified by a soon-to-be-useful icon) login square, a modal will display
+    //asking if you would like to login. If you would not, simply clicking no thank you closes the modal.
+    //If you push login, then your username and info will be logged to firebase. 
+    L.easyButton(
+        "fa-sign-in", function () {
+            $("#loginModal").modal("show");
+        },
+        'Login to enable saving and filtering pins by username'
+    ).addTo(map);
 
     //multiple form submissions in one browser session increases the number of data points submitted by one for each
     //form submission
@@ -91,7 +103,8 @@ $(document).ready(function () {
     map.locate({ setView: true, maxZoom: 18 });
 
     //create a global capture for active/current location, set it, show modal, and use that global var, then
-    //pass that data to firebase
+    //pass that data to firebase. Using global capture allows for me to avoid generating multiple instances like when
+    //I would nest the capture inside a function that calls everytime the user clicks a button.
     $("#captionAdd, #noCaption").click(function () {
         event.preventDefault();
         //$("#captionAdd").attr("disabled", true); //testing
@@ -112,4 +125,35 @@ $(document).ready(function () {
         };
         $("#captionModal").modal("hide");
     });
+
+    $("#loginAdd").on("click", function () {
+        event.preventDefault();
+        var loginEmail = $("#exampleInputEmail1").val().trim();
+        var loginPassword = $("#exampleInputPassword1").val().trim();
+        firebase.auth().signInWithEmailAndPassword(loginEmail, loginPassword).catch(function (error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // ...
+        });
+    });
+    $("#signIn").on("click", function () {
+        event.preventDefault();
+        firebase.auth().signInWithRedirect(provider).then(function (result) {
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            var token = result.credential.accessToken;
+            // The signed-in user info.
+            var user = result.user;
+            // ...
+        }).catch(function (error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // The email of the user's account used.
+            var email = error.email;
+            // The firebase.auth.AuthCredential type that was used.
+            var credential = error.credential;
+            // ...
+        });
+    })
 });
