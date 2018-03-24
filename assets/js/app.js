@@ -20,8 +20,6 @@ $(document).ready(function () {
     // Create a storage reference from our storage service
     var storageRef = storage.ref();
 
-    var map = L.map('map').fitWorld();
-
 
     var mapBox = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
         maxZoom: 18,
@@ -591,63 +589,6 @@ $(document).ready(function () {
         setView: true,
         maxZoom: 18
     });
-
-    // BEGIN CAMERA TESTING ===============================================================================
-    $("#open-camera").on("click", function () {
-        event.preventDefault();
-
-        $("#video-card").css("display", "block");
-
-        function hasGetUserMedia() {
-            return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-        }
-
-        if (hasGetUserMedia()) {
-            // Good to go!
-        } else {
-            alert('getUserMedia() is not supported by your browser');
-        }
-
-        const constraints = {
-            video: true
-        };
-
-        const video = document.querySelector('video');
-
-        function handleSuccess(stream) {
-            video.srcObject = stream;
-        }
-
-        function handleError(error) {
-            console.error('Reeeejected!', error);
-        }
-
-        const button = document.querySelector('#screenshot-button');
-        const img = document.querySelector('#screenshot-img');
-        const canvas = document.createElement('canvas');
-
-        button.onclick = video.onclick = function () {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            // Other browsers will fall back to image/png
-            img.src = canvas.toDataURL('image/webp');
-        };
-
-        function handleSuccess(stream) {
-            video.srcObject = stream;
-        }
-
-        navigator.mediaDevices.getUserMedia(constraints).
-            then(handleSuccess).catch(handleError);
-
-
-
-    });
-
-    // END CAMERA TESTING =================================================================================
-
-
 
 
     $("#distance-filter").on("click", function () {
