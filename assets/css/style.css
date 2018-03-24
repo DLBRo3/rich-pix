@@ -1,7 +1,3 @@
-body {
-    background: none;
-}
-
 .container-fluid,
 body,
 html,
@@ -12,9 +8,10 @@ html,
 
 #map {
     height: 100%;
+    
 }
 
-#pov-btn {
+#over-map {
     z-index: 1000;
     transition: none !important;
     text-align: center;
@@ -24,4 +21,12 @@ html,
 
 .btn-group-vertical > .btn:hover {
     z-index: 1000;
+}
+
+.btn {
+    margin-bottom: 5px;
+}
+
+#video-card {
+    display: none;
 }
