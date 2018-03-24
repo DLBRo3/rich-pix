@@ -14,7 +14,13 @@ $(document).ready(function () {
 
     var database = firebase.database();
 
-    // Add Map Tiles
+    // Get a reference to the storage service, which is used to create references in your storage bucket
+    var storage = firebase.storage();
+
+    // Create a storage reference from our storage service
+    var storageRef = storage.ref();
+
+    var map = L.map('map').fitWorld();
 
 
     var mapBox = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
@@ -159,8 +165,6 @@ $(document).ready(function () {
 
 
     //load child pins that are saved into firebase
-
-
     function getPins() {
         database
             .ref("/connections")
@@ -179,7 +183,7 @@ $(document).ready(function () {
                 marker = L.marker([childSnapshot.val().lat, childSnapshot.val().lng]);
                 marker.date = childSnapshot.val().date;
                 marker.bindPopup(
-                    `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}<br>Category: ${childCategory}`
+                    `<img src="${childImage}"><br>Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}<br>Category: ${childCategory}`
                 )
                 // add each marker to global markers layer group
                 // each marker is now stored in the markers layer group and can be manipulated locally instead of on firebase
@@ -436,7 +440,6 @@ $(document).ready(function () {
     //save the data from this locate into global vars, then pass that into the modal.
     map.on('locationfound', locatePhone);
 
-
     //create a global capture for active/current location, set it, show modal, and use that global var, then
     //pass that data to firebase. Using global capture allows for me to avoid generating multiple instances like when
     //I would nest the capture inside a function that calls everytime the user clicks a button.
@@ -444,6 +447,65 @@ $(document).ready(function () {
         event.preventDefault();
         var currentDate = moment().format("L");
         //$("#captionAdd").attr("disabled", true); //testing
+
+        // IMAGE STORAGE +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        // File or Blob named mountains.jpg
+        var file = $("#pov-pic").get(0).files[0];
+        var fileName = (+new Date()) + '-' + file.name;
+
+        // Create the file metadata
+        var metadata = {
+            contentType: 'image/jpeg'
+        };
+
+        // Upload file and metadata to the object 'images/mountains.jpg'
+        var uploadTask = storageRef.child('images/' + fileName).put(file, metadata);
+
+        // Listen for state changes, errors, and completion of the upload.
+        uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+            function (snapshot) {
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log('Upload is ' + progress + '% done');
+                switch (snapshot.state) {
+                    case firebase.storage.TaskState.PAUSED: // or 'paused'
+                        console.log('Upload is paused');
+                        break;
+                    case firebase.storage.TaskState.RUNNING: // or 'running'
+                        console.log('Upload is running');
+                        break;
+                }
+            },
+            function (error) {
+
+                // A full list of error codes is available at
+                // https://firebase.google.com/docs/storage/web/handle-errors
+                switch (error.code) {
+                    case 'storage/unauthorized':
+                        // User doesn't have permission to access the object
+                        break;
+
+                    case 'storage/canceled':
+                        // User canceled the upload
+                        break;
+
+                    case 'storage/unknown':
+                        // Unknown error occurred, inspect error.serverResponse
+                        break;
+                }
+            },
+            function () {
+                // Upload completed successfully, now we can get the download URL
+                var downloadURL = uploadTask.snapshot.downloadURL;
+                var captionValue = $("#caption-text").val();
+                database.ref("/connections").push({
+                    lat: currentLocation.lat,
+                    lng: currentLocation.lng,
+                    caption: captionValue,
+                    image: downloadURL,
+                });
+            }
+        );
         if (this.id === "captionAdd") {
             var captionValue = $("#caption-text").val();
             database.ref("/connections").push({
@@ -461,6 +523,8 @@ $(document).ready(function () {
                 caption: "No Caption Provided",
             });
         };
+        // END IMAGE STORAGE +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
         $("#captionModal").modal("hide");
     });
 
