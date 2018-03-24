@@ -75,8 +75,7 @@ $(document).ready(function () {
         "Street Map": mapBox,
         "Satellite": satellite,
         "Night": night
-
-
+    }
     //Drop leaflet custom method (L.easybutton) to create login button
     //When you push the (identified by a soon-to-be-useful icon) login square, a modal will display
     //asking if you would like to login. If you would not, simply clicking no thank you closes the modal.
