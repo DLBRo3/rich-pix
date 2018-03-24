@@ -69,7 +69,8 @@ $(document).ready(function () {
 
     L.control.layers(baseLayers).addTo(map);
 
-    
+    // Variable for the pin that's being selected to delete
+    var selectedPin;
 
 
 
@@ -97,12 +98,30 @@ $(document).ready(function () {
           //display pins
             marker = L.marker([childSnapshot.val().lat, childSnapshot.val().lng]);
             marker.bindPopup(
-              `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}`
+              `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}<br>`
             )
+            // selected pin from map using lat lng
+            marker.on("click", function(pin) {
+                selectedPin = pin.latlng; // here we can add selectedPin = key to give unique keys for for each pin
+            });
+
+
+
             // .addTo(map);
             map.addLayer(marker);
             // map.removeLayer(marker); this works here 
-            
+        
+
+
+        
+        
+        });
+        // select pin, click delete and will show the pin you selected to delete in console, refresh page then key is gone
+        $("#delete-pin").on("click", function() {
+            console.log(selectedPin);
+            // => replace of a function orders pins by lat and removes on delete button
+            database.ref("/connections").orderByChild("/lat").equalTo(selectedPin.lat).once('value', snapshot => snapshot.forEach(child => child.ref.remove()));
+        
         });
     // }
     
@@ -171,8 +190,7 @@ $(document).ready(function () {
                     `Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}`
                 )
                 .addTo(map);
-
-
+        
         });
 
 
@@ -195,7 +213,7 @@ $(document).ready(function () {
         setView: true,
         maxZoom: 18
     });
-    getPins();
+    // getPins();
 
 
     //The geocoding is inside this click event, so it will not happen unless the user clicks the "Share Your POV" button.
