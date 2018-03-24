@@ -15,13 +15,18 @@ Have you ever visited a city and wished you had the local knowledge and know how
 #### Use Cases 
 
 Someone wants to find a place to watch the sunset within a certain radius of where they are. 
+
 Someone wants to search for places where lots of people have submitted photos as these places must be good places to visit. 
 
 Someone sees a pothole and submits photo to the app which then gets alerted to City of Richmond
+
 Someone wants to find places with excellent hummus - they can search the user submissions for places with hummus. 
+
 Someone wants to find awesome places to spend a Saturday on the James River- they can use the app to see where others have submitted points and search for what they were doing. 
 
 Someone really loves sunning on a particular rock on the James River. They can log it in the app and share so others can also check out the rock. 
+
+Someone is looking for good fishing spots.  They can log in to the app and see where others have gone fishing on the James River and see comments pictures of fish caught. 
 
 
 
@@ -33,9 +38,3 @@ Mapping interface that the user has the ability to drop a pin on and add a photo
 #### API's
 
 OpenStreetMap, Open Weather API
-
-#### Rough Breakdown of Tasks
-
-1. Research APIs - all group members
-1. Create a Repo - Graham 
-
