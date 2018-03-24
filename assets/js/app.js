@@ -649,6 +649,7 @@ $(document).ready(function () {
 
 
 
+
     $("#distance-filter").on("click", function () {
         event.preventDefault();
         map.locate();
