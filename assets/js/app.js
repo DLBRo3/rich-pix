@@ -182,8 +182,8 @@ $(document).ready(function () {
                 marker = L.marker([childSnapshot.val().lat, childSnapshot.val().lng]);
                 marker.date = childSnapshot.val().date;
                 marker.bindPopup(
-                    `<img src="${childImage}" id="povThumb"><br>Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}<br>Category: ${childCategory}`
-                )
+                    `<img src="${childImage}" id="povThumb" height="100%" width="300px"><p>Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}<br>Category: ${childCategory}</p>`
+                ).openPopup();
                 // add each marker to global markers layer group
                 // each marker is now stored in the markers layer group and can be manipulated locally instead of on firebase
                 markers.addLayer(marker);
