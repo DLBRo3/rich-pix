@@ -26,12 +26,20 @@ $(document).ready(function () {
                 // Handle Errors here.
                 var errorCode = error.code;
                 var errorMessage = error.message;
+                console.log(`${errorCode} ${error.message}`);
                 // ...
+            });
+            var currentUser = firebase.auth().currentUser;
+            //K, so threw an error first time, then sent verification email and allowed me to sign in.
+            currentUser.sendEmailVerification().then(function () {
+                // Email sent.
+            }).catch(function (error) {
+                // An error happened.
+                console.log(error);
             });
         }
         catch (err) {
             alert("Please " + err)
         }
     });
-
 });
