@@ -70,9 +70,12 @@
 <body>
     <div id="map" class="container-fluid h-100">
         <div class="row justify-content-center h-100 align-items-center">
+            <div id="logo">
+                <h5>RichPix</h5>
+            </div>
 
             <div id="over-map">
-                <div class="btn-group-vertical">
+                <div class="btn-group">
                     <button id="drop-pin" class="btn btn-success btn-sm">
                         SHARE YOUR POV
                     </button>
@@ -83,19 +86,6 @@
                     <button id="delete-pin" class="btn btn-danger btn-sm">
                         DELETE PIN
                     </button>
-                </div>
-                <div id="video-card" class="card">
-                    <div class="card-header">
-                        Camera Test
-                    </div>
-                    <div class="card-body">
-                        <video id="screenshot-video" autoplay></video>
-                        <img id="screenshot-img" src="">
-                        <canvas style="display:none;"></canvas>
-                        <button id="screenshot-button" class="btn btn-primary btn-sm">
-                            TAKE PHOTO
-                        </button>
-                    </div>
                 </div>
             </div>
             <div class="modal fade" id="captionModal" tabindex="-1" role="dialog" aria-labelledby="captionModalLabel" aria-hidden="true">
