@@ -591,7 +591,7 @@ $(document).ready(function () {
         maxZoom: 18
     });
 
-    
+
     $("#distance-filter").on("click", function () {
         event.preventDefault();
         map.locate();
