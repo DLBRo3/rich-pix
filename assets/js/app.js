@@ -182,7 +182,7 @@ $(document).ready(function () {
                 marker = L.marker([childSnapshot.val().lat, childSnapshot.val().lng]);
                 marker.date = childSnapshot.val().date;
                 marker.bindPopup(
-                    `<img src="${childImage}"><br>Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}<br>Category: ${childCategory}`
+                    `<img src="https://firebasestorage.googleapis.com/v0/b/rich-pix-3d31b.appspot.com/o/images%2Fimage_thumb.jpg?alt=media&token=b6c647f7-87d9-4834-a7c8-8225c9d17661" id="povThumb"><br>Lat: ${childLat}<br>Lng: ${childLng}<br>Date: ${childDate}<br>Category: ${childCategory} <script>$('#povThumb').click(function() { $("#captionModal").modal("show"); $("#povImage").html("<img src="${childImage}">"); });</script>`
                 )
                 // add each marker to global markers layer group
                 // each marker is now stored in the markers layer group and can be manipulated locally instead of on firebase
