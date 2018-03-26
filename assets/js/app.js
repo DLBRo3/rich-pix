@@ -174,8 +174,9 @@ $(document).ready(function () {
                     childLng = Number.parseFloat(
                         childSnapshot.val().lng
                     ).toPrecision(4),
-                    childDate = childSnapshot.val().date;
-                    childCategory = childSnapshot.val().category;
+                    childDate = childSnapshot.val().date,
+                    childCategory = childSnapshot.val().category,
+                    childImage = childSnapshot.val().image;
                     
                 // create markers with popup from firebase 
                 marker = L.marker([childSnapshot.val().lat, childSnapshot.val().lng]);
